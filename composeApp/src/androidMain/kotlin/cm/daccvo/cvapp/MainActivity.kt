@@ -172,14 +172,7 @@ class MainActivity : ComponentActivity() {
         }
         exchangeLauncher.launch(intent)
     }
-
-    fun performGlobalLogout(context: Context, logoutLauncher: ActivityResultLauncher<Intent>) {
-        val intent = Intent(Intent.ACTION_VIEW).apply {
-            data = Uri.parse("authapp://logout")
-            setPackage("com.ton.package.authapp")
-        }
-        logoutLauncher.launch(intent)
-    }
+    
 
     fun startLogout() {
         val intent = Intent(Intent.ACTION_VIEW).apply {
