@@ -9,6 +9,7 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun LoginSuccessDialog(
     show: Boolean,
+    token: String,
     onDismiss: () -> Unit,
     onContinue: () -> Unit
 ) {
@@ -20,7 +21,7 @@ fun LoginSuccessDialog(
 
         title = {
             Text(
-                text = "Connexion réussie",
+                text = "Connexion réussie le token : $token",
                 fontSize = 20.sp
             )
         },

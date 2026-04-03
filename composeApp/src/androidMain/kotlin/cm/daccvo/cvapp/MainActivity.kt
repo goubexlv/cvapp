@@ -1,12 +1,14 @@
 package cm.daccvo.cvapp
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,6 +28,8 @@ import cm.daccvo.cvapp.ui.RefreshScreen
 
 class MainActivity : ComponentActivity() {
     private var showSuccess by mutableStateOf(false)
+    private var accessToken by mutableStateOf("")
+
     private val authLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -37,9 +41,39 @@ class MainActivity : ComponentActivity() {
             if (status == "SUCCESS") {
                 // Bravo ! Tu as ton JWT de 10 min, envoie-le à ton backend CV
                 println("Token reçu ")
-                showSuccess = true
+                startExchange()
+
 
             }
+        }
+    }
+
+    private val exchangeLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            // Récupération des tokens de manière sécurisée (pas via l'URL)
+            val accessTokens = result.data?.getStringExtra("accessToken")
+
+            if (accessTokens != null) {
+                // Stocke tes tokens et connecte l'utilisateur
+                accessToken = accessTokens
+                showSuccess = true
+                println("Connexion réussie ! AccessToken: $accessToken")
+            }
+        } else {
+            // Gérer l'annulation (bouton retour)
+            println("L'utilisateur a annulé la connexion")
+        }
+    }
+
+    private val logoutLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            // La déconnexion globale a réussi !
+            // Rediriger vers l'écran de login de CV App
+
         }
     }
 
@@ -48,14 +82,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
 
-
         setContent {
 
             if (showSuccess) {
                 LoginSuccessDialog(
 
                     show = showSuccess,
-
+                    token = accessToken,
                     onDismiss = {
                         showSuccess = false
                     },
@@ -90,6 +123,7 @@ class MainActivity : ComponentActivity() {
                         userName = "John Doe",
                         email = "john@gmail.com",
                         onLogout = {
+                            startLogout()
                             navController.navigate("login") {
                                 popUpTo("login") { inclusive = true }
                             }
@@ -128,6 +162,31 @@ class MainActivity : ComponentActivity() {
 
         // 3. Lancer l'activité
         authLauncher.launch(intent)
+    }
+
+    private fun startExchange() {
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            data = Uri.parse("authapp://exchange-token?service=CV")
+            // On force le package pour être sûr d'ouvrir la bonne App Auth
+            setPackage("cm.daccvo.auth")
+        }
+        exchangeLauncher.launch(intent)
+    }
+
+    fun performGlobalLogout(context: Context, logoutLauncher: ActivityResultLauncher<Intent>) {
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            data = Uri.parse("authapp://logout")
+            setPackage("com.ton.package.authapp")
+        }
+        logoutLauncher.launch(intent)
+    }
+
+    fun startLogout() {
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            data = Uri.parse("authapp://logout")
+            setPackage("cm.daccvo.auth")
+        }
+        logoutLauncher.launch(intent)
     }
 
 }

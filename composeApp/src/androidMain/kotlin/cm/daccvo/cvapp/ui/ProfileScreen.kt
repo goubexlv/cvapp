@@ -53,7 +53,10 @@ fun ProfileScreen(
         Button(
             onClick = onLogout
         ) {
+
             Text("Logout")
         }
     }
 }
+
+
