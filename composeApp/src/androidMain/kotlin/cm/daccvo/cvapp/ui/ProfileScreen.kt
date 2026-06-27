@@ -19,7 +19,8 @@ fun ProfileScreen(
     userName: String,
     email: String,
     onLogout: () -> Unit,
-    onRefreshClick: () -> Unit
+    onRefreshClick: () -> Unit,
+    onBack: () -> Unit
 ) {
 
     Column(
@@ -55,6 +56,14 @@ fun ProfileScreen(
         ) {
 
             Text("Logout")
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Button(
+            onClick = onBack
+        ) {
+            Text("Retour")
         }
     }
 }

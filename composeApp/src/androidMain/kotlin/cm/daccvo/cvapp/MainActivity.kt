@@ -43,7 +43,6 @@ class MainActivity : ComponentActivity() {
                 println("Token reçu ")
                 startExchange()
 
-
             }
         }
     }
@@ -130,6 +129,9 @@ class MainActivity : ComponentActivity() {
                         },
                         onRefreshClick = {
                             navController.navigate("refresh")
+                        },
+                        onBack = {
+                            navController.popBackStack()
                         }
                     )
                 }
@@ -157,7 +159,7 @@ class MainActivity : ComponentActivity() {
 
         val intent = Intent(Intent.ACTION_VIEW, authUri).apply {
             // Indispensable pour que Auth App puisse voir 'callingPackage'
-            setPackage("cm.daccvo.auth")
+            setPackage("io.horion.service_auth_orion")
         }
 
         // 3. Lancer l'activité
@@ -168,7 +170,7 @@ class MainActivity : ComponentActivity() {
         val intent = Intent(Intent.ACTION_VIEW).apply {
             data = Uri.parse("authapp://exchange-token?service=CV")
             // On force le package pour être sûr d'ouvrir la bonne App Auth
-            setPackage("cm.daccvo.auth")
+            setPackage("io.horion.service_auth_orion")
         }
         exchangeLauncher.launch(intent)
     }
@@ -177,7 +179,7 @@ class MainActivity : ComponentActivity() {
     fun startLogout() {
         val intent = Intent(Intent.ACTION_VIEW).apply {
             data = Uri.parse("authapp://logout")
-            setPackage("cm.daccvo.auth")
+            setPackage("io.horion.service_auth_orion")
         }
         logoutLauncher.launch(intent)
     }
